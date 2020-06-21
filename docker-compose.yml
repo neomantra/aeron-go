@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+
+  media-driver:
+    container_name: media-driver
+    image: neomantra/aeron-cpp-debian:1.28.2
+    restart: always
+    shm_size: 128M
+    ipc: host
+    network_mode: host
+    environment:
+      AERON_PRINT_CONFIGURATION: 1
+
+#docker run --shm-size=256M --ipc host --network host  --entrypoint=/bin/bash neomantra/aeron-cpp-debian:1.28.2:1.28.0 -DAERON_PRINT_CONFIGURATION=1
+#docker run -it --shm-size=256M --ipc host --network host aeron-go-examples
+
+  pong:
+    depends_on: [ "media-driver" ]
+    container_name: pong
+    restart: always
+    command: /aeron-go/pong -p /dev/shm/aeron-default
+    build: .
+    ipc: host
+    network_mode: host
+    # volumes:
+    #   - ./dev/:/dev/shm/
+  
+  ping:
+    depends_on: [ "media-driver" ]
+    container_name: ping
+    restart: always
+    command: /aeron-go/ping -p /dev/shm/aeron-default
+    build: .
+    ipc: host
+    network_mode: host
+    # volumes:
+    #   - ./dev/:/dev/shm/
+
+  # basic_publisher:
+  #   depends_on: [ "media-driver" ]
+  #   container_name: basic_publisher
+  #   restart: always
+  #   command: /aeron-go/examples/basic_publisher/basic_publisher -p /dev/shm/aeron-default
+  #   build: .
+  #   ipc: host
+  #   network_mode: host
+  #   # volumes:
+  #   #   - ./dev/:/dev/shm/
+
+  # basic_subscriber:
+  #   depends_on: [ "basic_publisher" ]
+  #   container_name: basic_subscriber
+  #   restart: always
+  #   command: /aeron-go/examples/basic_subscriber/basic_subscriber -p /dev/shm/aeron-default
+  #   build: .
+  #   ipc: host
+  #   network_mode: host
+  #   # volumes:
+  #   #   - ./dev/:/dev/shm/
+  
